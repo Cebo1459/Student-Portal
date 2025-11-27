@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutor Portal</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1e293b;
+      --background-color: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-container, .upload-container {
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .upload-container {
+      max-width: 800px;
+      display: none;
+    }
+
+    h1 {
+      color: var(--secondary-color);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--secondary-color);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .upload-area {
+      border: 2px dashed #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      text-align: center;
+      margin: 1rem 0;
+      cursor: pointer;
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary-color);
+    }
+
+    .resource-list {
+      margin-top: 2rem;
+    }
+
+    .resource-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container" id="registerForm" style="display: none;">
+  <h1>Register</h1>
+  <form onsubmit="handleRegister(event)">
+    <div class="form-group">
+      <label for="regEmail">Email</label>
+      <input type="email" id="regEmail" required />
+    </div>
+    <div class="form-group">
+      <label for="regPassword">Password</label>
+      <input type="password" id="regPassword" required />
+    </div>
+    <button type="submit">Register</button>
+    <p style="text-align:center; margin-top:1rem;">
+      Already have an account? <a href="#" onclick="toggleForms('login')">Login</a>
+    </p>
+  </form>
+</div>
+
+  <div class="login-container" id="loginForm">
+    <h1>Tutor Login</h1>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+      <button type="submit">Login</button>
+      <p style="text-align:center; margin-top:1rem;">
+  Don't have an account? <a href="#" onclick="toggleForms('register')">Register</a>
+</p>
+    </form>
+  </div>
+
+  <div class="upload-container" id="uploadForm">
+    <h1>Upload Resources</h1>
+    <form onsubmit="handleUpload(event)">
+      <div class="form-group">
+        <label for="moduleSelect">Select Module</label>
+        <select id="moduleSelect" required>
+          <option value="">Choose a module...</option>
+          <option value="popa">Principles of Programming A</option>
+          <option value="popb">Principles of Programming B</option>
+          <option value="compmaths">Computational Mathematics</option>
+          <option value="discrete">Discrete Structures</option>
+          <option value="cap">Communication for Academic Purpose</option>
+          <option value="compfund">Computer Fundamentals A</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="resourceType">Resource Type</label>
+        <select id="resourceType" required>
+          <option value="">Choose type...</option>
+          <option value="document">Document</option>
+          <option value="video">Video</option>
+          <option value="recording">Recording</option>
+        </select>
+      </div>
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <p>Click to upload or drag files here</p>
+        <input type="file" name= "files" id="fileInput" style="display: none" accept=".pdf,.doc,.docx,.mp4,.mp3,.wav" multiple />
+      </div>
+      <button type="submit">Upload Resources</button>
+    </form>
+
+    <div class="resource-list">
+      <h2>Uploaded Resources</h2>
+      <div id="resourcesList"></div>
+    </div>
+  </div>
+
+  <script>
+   
+  function toggleForms(form) {
+    document.getElementById('loginForm').style.display = form === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = form === 'register' ? 'block' : 'none';
+  }
+
+  async function handleRegister(event) {
+    event.preventDefault();
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+
+    try {
+      const response = await fetch('http://localhost:3000/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Registration failed');
+
+      alert('Registration successful! You can now log in.');
+      toggleForms('login');
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert(error.message);
+    }
+  }
+
+  async function handleLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Login failed');
+
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('uploadForm').style.display = 'block';
+    } catch (error) {
+      console.error('Login error:', error);
+      alert(error.message);
+    }
+  }
+
+    async function handleUpload(event) {
+      event.preventDefault();
+
+      const module = document.getElementById('moduleSelect').value;
+      const type = document.getElementById('resourceType').value;
+      const files = document.getElementById('fileInput').files;
+
+      if (!module || !type || files.length === 0) {
+        alert("Please select a module, resource type, and at least one file.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('module', module);
+      formData.append('type', type);
+      for (let file of files) {
+        formData.append('files', file);
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || "Upload failed");
+        }
+
+        const resourcesList = document.getElementById('resourcesList');
+        result.resources.forEach(resource => {
+          const item = document.createElement('div');
+          item.className = 'resource-item';
+          item.innerHTML = `
+            <span>${resource.originalname}</span>
+            <span>${resource.module} - ${resource.type}</span>
+          `;
+          resourcesList.appendChild(item);
+        });
+
+        event.target.reset();
+        document.getElementById('fileInput').value = '';
+      } catch (error) {
+        console.error("Upload error:", error);
+        alert("An error occurred while uploading. Please try again.");
+      }
+    }
+
+    // Drag and drop support
+    const uploadArea = document.querySelector('.upload-area');
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      document.getElementById('fileInput').files = files;
+    }
+  </script>
+</body>
+</html>

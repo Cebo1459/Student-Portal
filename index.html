@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Computer Science Learning Portal - Access papers, PDFs, books and video materials">
+    <title>CS Learning Hub</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e293b;
+            --background-color: #f8fafc;
+            --text-color: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        /* Module Gallery Styles */
+        .module-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgb(0 0 0 / 0.15);
+        }
+
+        .module-card__image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: var(--primary-color);
+        }
+
+        .module-card__content {
+            padding: 1.5rem;
+        }
+
+        .module-card__title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .module-card__description {
+            font-size: 0.875rem;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .module-card__stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-color);
+        }
+
+        /* Download Button Styles */
+        .module-card__actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .download-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .download-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .resource-section {
+            margin-bottom: 2rem;
+        }
+
+        .resource-section-title {
+            color: var(--secondary-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .resource-list-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 1rem;
+            border-radius: 0.5rem;
+            background: #f8fafc;
+        }
+
+        .resource-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .resource-item:last-child {
+            border-bottom: none;
+        }
+
+        .resource-info {
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .resource-download-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .resource-download-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Custom scrollbar styles */
+        .resource-list-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .resource-list-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .resource-list-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .resource-list-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            height: 100%;
+            width: 300px;
+            background: white;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .menu-item:hover {
+            background: var(--background-color);
+        }
+
+        .menu-item.active {
+            background: var(--background-color);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--secondary-color);
+        }
+
+        .hamburger-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1002;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Overlay for sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+     <div id="root">
+        <button class="hamburger-btn" onclick="toggleSidebar()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Menu</h2>
+                <button onclick="toggleSidebar()" style="background:none; border:none; color:white; cursor:pointer;">
+                    ×
+                </button>
+            </div>
+            <ul class="menu-items">
+                <li class="menu-item active">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                    </svg>
+                    Student Portal
+                </li>
+                <li class="menu-item">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Administrator
+                </li>
+                <li class="menu-item">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    Contact Us
+                </li>
+                <li class="menu-item">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Reviews & Feedback
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <main class="module-gallery">
+            <!-- First Year Modules - Semester 1 -->
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">PPA - Principles of Programming A</h2>
+                    <p class="module-card__description">
+                        Introduction to programming fundamentals and problem-solving techniques.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 15 Resources</span>
+                            <span>⭐ 4.8/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('ppa')">
+                            <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- First Year - Semester 1 -->
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">CAP - Communication for Academic Purposes</h2>
+                    <p class="module-card__description">
+                        Academic writing, research skills, and professional communication techniques.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 10 Resources</span>
+                            <span>⭐ 4.4/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('cap')">
+                            <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">COH - Computing Horizons</h2>
+                    <p class="module-card__description">
+                        Explore the impact of computing in society and develop computational thinking.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 12 Resources</span>
+                            <span>⭐ 4.7/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('coh')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                           
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">CFA - Computer Fundamentals A</h2>
+                    <p class="module-card__description">
+                        Basic computer architecture, operating systems, and digital logic.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 20 Resources</span>
+                            <span>⭐ 4.8/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('cfa')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                           
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">INL - Information Literacy</h2>
+                    <p class="module-card__description">
+                        Develop skills to locate, evaluate, and use information effectively.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 8 Resources</span>
+                            <span>⭐ 4.6/5</span>
+                        </div>
+                        <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">LFS - Life Skills</h2>
+                    <p class="module-card__description">
+                        Essential skills for personal development and effective communication.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 10 Resources</span>
+                            <span>⭐ 4.5/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('lfs')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- First Year - Semester 2 -->
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">PPB - Principles of Programming B</h2>
+                    <p class="module-card__description">
+                        Advanced programming concepts, object-oriented programming, and software design.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 14 Resources</span>
+                            <span>⭐ 4.7/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('ppb')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">CFB - Computer Fundamentals B</h2>
+                    <p class="module-card__description">
+                        Intermediate concepts in computer architecture, operating systems, and networking.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 18 Resources</span>
+                            <span>⭐ 4.6/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('cfb')">
+                             <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">DCT - Discrete Structures</h2>
+                    <p class="module-card__description">
+                        Logic, sets, relations, functions, and mathematical reasoning for computer science.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 16 Resources</span>
+                            <span>⭐ 4.6/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('dct')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">WEB - Web Development</h2>
+                    <p class="module-card__description">
+                        Learn the basics of web development, including HTML, CSS, and JavaScript.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 14 Resources</span>
+                            <span>⭐ 4.7/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('web')">
+                          <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Second Year - Semester 1 -->
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">CAO - Computer Architecture and Organization</h2>
+                    <p class="module-card__description">
+                        Understand computer organization, architecture, and the basics of assembly language.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 12 Resources</span>
+                            <span>⭐ 4.8/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('cao')">
+                            <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">ADS - Algorithms and Data Structures</h2>
+                    <p class="module-card__description">
+                        Learn fundamental algorithms, data structures, and their implementations.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 12 Resources</span>
+                            <span>⭐ 4.8/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('ads')">
+                          <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">DTP - Development Theory and Practice</h2>
+                    <p class="module-card__description">
+                        Explore software development methodologies, project management, and teamwork.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 10 Resources</span>
+                            <span>⭐ 4.6/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('dtp')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">OOP - Object-Oriented Programming</h2>
+                    <p class="module-card__description">
+                        Master object-oriented programming concepts, design patterns, and best practices.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 14 Resources</span>
+                            <span>⭐ 4.7/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('oop')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">SEF - Software Engineering Fundamentals</h2>
+                    <p class="module-card__description">
+                        Introduction to software engineering principles, methodologies, and lifecycle.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 10 Resources</span>
+                            <span>⭐ 4.5/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('sef')">
+                            <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Second Year - Semester 2 -->
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">ORS - Operating Systems</h2>
+                    <p class="module-card__description">
+                        Dive into operating system concepts, architecture, and design principles.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 12 Resources</span>
+                            <span>⭐ 4.8/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('ors')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">ISC - Information Security</h2>
+                    <p class="module-card__description">
+                        Understand the principles of information security, risk management, and cryptography.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 10 Resources</span>
+                            <span>⭐ 4.6/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('isc')">
+                            <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">AOP - Advanced Object-Oriented Programming</h2>
+                    <p class="module-card__description">
+                        Explore advanced topics in OOP, including design patterns and software architecture.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 14 Resources</span>
+                            <span>⭐ 4.7/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('aop')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">INT - Internet Programming</h2>
+                    <p class="module-card__description">
+                        Learn to develop dynamic web applications using server-side programming and databases.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 16 Resources</span>
+                            <span>⭐ 4.8/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('int')">
+                            <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">DBP - Database Principles</h2>
+                    <p class="module-card__description">
+                        Understand database design, normalization, and SQL for relational databases.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 10 Resources</span>
+                            <span>⭐ 4.5/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('dbp')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="module-card">
+                <div class="module-card__image"></div>
+                <div class="module-card__content">
+                    <h2 class="module-card__title">MOB - Mobile Development</h2>
+                    <p class="module-card__description">
+                        Introduction to mobile app development for Android and iOS platforms.
+                    </p>
+                    <div class="module-card__actions">
+                        <div class="module-card__stats">
+                            <span>📚 12 Resources</span>
+                            <span>⭐ 4.6/5</span>
+                        </div>
+                        <button class="download-btn" onclick="event.stopPropagation(); openResourcesModal('mob')">
+                           <div class="resource-item">
+                              <span class="resource-trigger" onclick="loadDownloadList()">Show Resource</span>
+                              <select id="resourceSelect" style="display:none;"></select>
+                              <button id="downloadBtn" style="display:none;" onclick="downloadSelectedResource()">Download</button>
+                            </div>
+                            View Resources
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </main>
+
+        <noscript>
+            You need to enable JavaScript to run this application.
+        </noscript>
+    </div>
+
+    <!-- Loading animation before app loads -->
+    <div id="loader" class="loader">
+        <svg width="50" height="50" viewBox="0 0 50 50">
+            <circle cx="25" cy="25" r="20" fill="none" stroke="var(--primary-color)" stroke-width="5">
+                <animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite"
+                    values="1,150;90,150;90,150"/>
+                <animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite"
+                    values="0;-35;-124"/>
+            </circle>
+        </svg>
+    </div>
+
+    <!-- Modal Markup -->
+    <div id="resourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="resourcesList" class="resources-grid">
+                <!-- Resources will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hide loader after page load
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loader').style.display = 'none';
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Touch swipe for sidebar
+        let touchStartX = 0;
+        let touchEndX = 0;
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        function handleSwipe() {
+            const swipeDistance = touchEndX - touchStartX;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (swipeDistance > 50 && touchStartX < 50) {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            } else if (swipeDistance < -50 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Menu item click handlers
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                const menuText = this.textContent.trim();
+                toggleSidebar();
+                switch(menuText) {
+                    case 'Student Portal':
+                        console.log('Navigating to Student Portal');
+                        break;
+                    case 'Administrator':
+                        window.location.href = 'Resource.html';
+                        break;
+                    case 'Contact Us':
+                        window.location.href = 'Contact.html';
+                        break;
+                    case 'Reviews & Feedback':
+                        window.location.href = 'Feedback.html';
+                        break;
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside
+        document.getElementById('sidebarOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                toggleSidebar();
+            }
+        });
+
+        // Prevent scrolling when sidebar is open
+        document.getElementById('sidebar').addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Modal close function
+        function closeModal() {
+            document.getElementById('resourceModal').classList.remove('active');
+        }
+
+        // Open resources modal and fetch from server
+       
+
+async function loadDownloadList() {
+  try {
+    const response = await fetch('http://localhost:3000/download/list');
+    const result = await response.json();
+
+    const select = document.getElementById('resourceSelect');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    select.innerHTML = ''; // Clear previous options
+
+    result.files.forEach(file => {
+      const option = document.createElement('option');
+      option.value = file.url;
+      option.textContent = file.name;
+      select.appendChild(option);
+    });
+
+    select.style.display = 'inline-block';
+    downloadBtn.style.display = 'inline-block';
+  } catch (err) {
+    console.error('Error loading download list:', err);
+    alert('Could not load files.');
+  }
+}
+
+function downloadSelectedResource() {
+  const select = document.getElementById('resourceSelect');
+  const fileUrl = select.value;
+  if (!fileUrl) return;
+
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = fileUrl.split('/').pop();
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+        
+       
+    </script>
+</body>
+</html>
+

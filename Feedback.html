@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback And Reviews</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e293b;
+            --background-color: #f8fafc;
+            --star-color: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            line-height: 1.5;
+            padding: 2rem;
+        }
+
+        .feedback-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h1, h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-group {
+            margin-bottom: 2rem;
+        }
+
+        .rating-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .stars {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .star {
+            color: var(--star-color);
+            cursor: pointer;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem; /* Reduced margin */
+            min-height: 100px;
+        }
+
+        .comment-form button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .comment-form button:hover {
+            background: #1d4ed8;
+        }
+
+        .feature-vote {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .vote-btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .vote-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Added styles for AI suggestions */
+        .ai-suggestions {
+            margin-bottom: 1rem;
+        }
+
+        .ai-suggestions button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 0.5rem;
+        }
+
+        .ai-suggestions button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback-container">
+        <h1>Feedback & Reviews</h1>
+
+        <section class="section">
+            <h2>Rate Your Experience</h2>
+            <div class="rating-group">
+                <div class="rating-item">
+                    <span>PDF Resources</span>
+                    <div class="stars" data-rating="0">
+                        <span class="star" onclick="rate(this, 1)">★</span>
+                        <span class="star" onclick="rate(this, 2)">★</span>
+                        <span class="star" onclick="rate(this, 3)">★</span>
+                        <span class="star" onclick="rate(this, 4)">★</span>
+                        <span class="star" onclick="rate(this, 5)">★</span>
+                    </div>
+                </div>
+                <div class="rating-item">
+                    <span>Video Content</span>
+                    <div class="stars" data-rating="0">
+                        <span class="star" onclick="rate(this, 1)">★</span>
+                        <span class="star" onclick="rate(this, 2)">★</span>
+                        <span class="star" onclick="rate(this, 3)">★</span>
+                        <span class="star" onclick="rate(this, 4)">★</span>
+                        <span class="star" onclick="rate(this, 5)">★</span>
+                    </div>
+                </div>
+                <div class="rating-item">
+                    <span>Navigation Experience</span>
+                    <div class="stars" data-rating="0">
+                        <span class="star" onclick="rate(this, 1)">★</span>
+                        <span class="star" onclick="rate(this, 2)">★</span>
+                        <span class="star" onclick="rate(this, 3)">★</span>
+                        <span class="star" onclick="rate(this, 4)">★</span>
+                        <span class="star" onclick="rate(this, 5)">★</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Suggestions & Comments</h2>
+            <form class="comment-form" onsubmit="submitFeedback(event)">
+                <div class="ai-suggestions" id="aiSuggestions">
+                    <!-- AI suggestions will be populated here -->
+                </div>
+                <textarea id="feedbackText" placeholder="Share your thoughts and suggestions for improvement..."></textarea>
+                <button type="button" onclick="getAISuggestions()">Get AI Suggestions</button>
+                <button type="submit" class="submit-btn">Submit Feedback</button>
+            </form>
+        </section>
+
+        <section class="section">
+            <h2>Vote on Future Features</h2>
+            <div class="feature-vote">
+                <div class="feature-item">
+                    <span>Mobile App Version (Q4 2023)</span>
+                    <button class="vote-btn" onclick="vote(this)">Vote</button>
+                </div>
+                <div class="feature-item">
+                    <span>Live Study Sessions (Q1 2024)</span>
+                    <button class="vote-btn" onclick="vote(this)">Vote</button>
+                </div>
+                <div class="feature-item">
+                    <span>AI Study Assistant (Q2 2024)</span>
+                    <button class="vote-btn" onclick="vote(this)">Vote</button>
+                </div>
+                <div class="feature-item">
+                    <span>Collaborative Notes (Q3 2024)</span>
+                    <button class="vote-btn" onclick="vote(this)">Vote</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function rate(star, value) {
+            const stars = star.parentElement;
+            stars.dataset.rating = value;
+            
+            // Reset all stars
+            Array.from(stars.children).forEach((s, index) => {
+                s.style.color = index < value ? 'var(--star-color)' : '#e2e8f0';
+            });
+        }
+
+        function vote(button) {
+            if (button.classList.contains('voted')) {
+                button.classList.remove('voted');
+                button.style.background = 'var(--primary-color)';
+                button.textContent = 'Vote';
+            } else {
+                button.classList.add('voted');
+                button.style.background = '#16a34a';
+                button.textContent = 'Voted!';
+            }
+        }
+
+        function submitFeedback(event) {
+            event.preventDefault();
+            const ratings = {};
+            document.querySelectorAll('.stars').forEach(stars => {
+                const category = stars.parentElement.previousElementSibling.textContent;
+                ratings[category] = stars.dataset.rating;
+            });
+            
+            const comment = document.getElementById('feedbackText').value;
+            
+            // Here you would typically send this data to your backend
+            console.log('Feedback submitted:', { ratings, comment });
+            alert('Thank you for your feedback!');
+            
+            // Reset form
+            document.getElementById('feedbackText').value = '';
+            document.querySelectorAll('.stars').forEach(stars => {
+                stars.dataset.rating = 0;
+                Array.from(stars.children).forEach(star => {
+                    star.style.color = '#e2e8f0';
+                });
+            });
+        }
+
+        async function getAISuggestions() {
+            const feedbackText = document.getElementById('feedbackText').value;
+            const aiSuggestionsDiv = document.getElementById('aiSuggestions');
+            aiSuggestionsDiv.innerHTML = '<p>Loading suggestions...</p>';
+
+            try {
+                const response = await fetch('http://localhost:3001/api/gemini', { // Replace with your server endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: feedbackText })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const suggestions = data.suggestions;
+
+                aiSuggestionsDiv.innerHTML = ''; // Clear loading message
+
+                suggestions.forEach(suggestion => {
+                    const button = document.createElement('button');
+                    button.textContent = suggestion;
+                    button.onclick = function() {
+                        document.getElementById('feedbackText').value = suggestion;
+                    };
+                    aiSuggestionsDiv.appendChild(button);
+                });
+            } catch (error) {
+                console.error('Error fetching AI suggestions:', error);
+                aiSuggestionsDiv.innerHTML = '<p>Error loading suggestions.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
